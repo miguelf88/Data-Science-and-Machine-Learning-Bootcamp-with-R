@@ -1,0 +1,47 @@
+## Data Visualization Project
+### R for Data Science - Udemy
+#### Miguel Fernandez
+This project will recreate a graph from [The Economist](https://www.economist.com/graphic-detail/2011/12/02/corrosive-corruption)
+
+```{r Setup, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(knitr)
+theme_set(theme_fivethirtyeight())
+theme_update(axis.title = element_text())
+
+df <- read_csv("Economist_Assignment_Data.csv")
+kable(head(df))
+```
+
+We can see this dataset contains information about countries and their corruption and human development measures.
+
+```{r Scatterplot1, fig.width=10, fig.height=7}
+# Create subset of data for labeling
+pointsToLabel <- c("Russia", "Venezuela", "Iraq", "Myanmar", "Sudan",
+                   "Afghanistan", "Congo", "Greece", "Argentina", "Brazil",
+                   "India", "Italy", "China", "South Africa", "Spane",
+                   "Botswana", "Cape Verde", "Bhutan", "Rwanda", "France",
+                   "United States", "Germany", "Britain", "Barbados", "Norway", "Japan",
+                   "New Zealand", "Singapore")
+
+# Create scatterplot comparing indices
+ggplot(df, aes(x = CPI, y = HDI, color = Region)) +
+  geom_point(shape = 1, size = 5, stroke = 1.25) +
+  geom_smooth(aes(group = 1),
+              method = 'lm',
+              formula = y ~ log(x),
+              se = FALSE,
+              color = 'red') +
+  geom_text(aes(label = Country),
+            color = 'gray20',
+            data = subset(df, Country %in% pointsToLabel),
+            check_overlap = TRUE) +
+  scale_x_continuous(limits = c(1,10),
+                     breaks = 1:10) +
+  scale_y_continuous(limits = c(0,1)) +
+  ggtitle("Corruption and Human Development") +
+  xlab("Corruption Perceptions Index, 2011 (10 = Least Corrupt)") +
+  ylab("Human Development Index, 2011 (1 = Best)")
+```
+
